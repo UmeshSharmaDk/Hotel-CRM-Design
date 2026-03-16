@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -69,12 +70,14 @@ export default function AnalyticsScreen() {
 
   const hotelOptions = hotels.map((h) => ({ label: h.name, value: h.id.toString() }));
 
-  useEffect(() => {
-    if (selectedHotelId) {
-      loadAgencies();
-      loadAnalytics();
-    }
-  }, [selectedHotelId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedHotelId) {
+        loadAgencies();
+        loadAnalytics();
+      }
+    }, [selectedHotelId])
+  );
 
   useEffect(() => {
     if (selectedHotelId) loadAnalytics();

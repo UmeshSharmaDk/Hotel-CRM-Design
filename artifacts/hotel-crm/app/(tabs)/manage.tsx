@@ -1,6 +1,6 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -44,9 +44,12 @@ export default function ManageScreen() {
 
   const hotelOptions = hotels.map((h) => ({ label: h.name, value: h.id.toString() }));
 
-  useEffect(() => {
-    if (selectedHotelId) loadData();
-  }, [selectedHotelId]);
+  useFocusEffect(
+    useCallback(() => {
+      reload();
+      if (selectedHotelId) loadData();
+    }, [selectedHotelId])
+  );
 
   const loadData = async () => {
     if (!selectedHotelId) return;

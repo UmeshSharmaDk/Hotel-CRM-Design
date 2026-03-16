@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import React, { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
@@ -133,9 +133,11 @@ export default function BookingsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    if (selectedHotelId) loadBookings();
-  }, [selectedHotelId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedHotelId) loadBookings();
+    }, [selectedHotelId])
+  );
 
   const loadBookings = async () => {
     if (!selectedHotelId) return;

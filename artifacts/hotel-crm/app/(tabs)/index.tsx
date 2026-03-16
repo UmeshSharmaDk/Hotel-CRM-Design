@@ -1,6 +1,6 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -45,9 +45,11 @@ export default function DashboardScreen() {
   const [forecastLoading, setForecastLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    if (selectedHotelId) loadForecast();
-  }, [selectedHotelId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedHotelId) loadForecast();
+    }, [selectedHotelId])
+  );
 
   const loadForecast = async () => {
     if (!selectedHotelId) return;
