@@ -1,0 +1,26 @@
+Build a cross-platform Mobile Hotel CRM with a centralized MySQL database managed via phpMyAdmin.Backend Architecture:Develop a RESTful API to handle communication between the mobile app and the MySQL database.Implementation of JWT (JSON Web Tokens) for secure user authentication.1. Authentication & Role-Based Access (RBAC):Login Screen: Mobile-optimized input for Email and Password.Admin Mobile Panel: A specialized view for System Admins to:CRUD Hotels (Name, Total Rooms).CRUD Users and assign them to specific Hotels.Assign Roles: Owner (Full access) or Manager (Full access except 'Delete Booking' permissions).2. Booking & Agency Management (Mobile UX):Booking Form: Use mobile-friendly date pickers and dropdowns.Calculation Logic: Real-time calculation of Total Cost ($Room Rent + Add-ons$) and Balance ($Total Cost - Receipt$).Payment Updates: A simple interface to update the Receipt field when guests make partial or full payments.Email Triggers: Backend logic to send a "Comparison Email" (Old vs. New data) to the Owner's email address whenever a booking is updated.3. Dashboard & Operations:Home Dashboard: Quick-action cards showing counts for "Today’s Check-ins" and "Today’s Check-outs."Lists: Tappable list views for Check-ins/outs that navigate to full booking details.Monthly Calendar/Filter: A screen to filter bookings by month.4. Analytics & Occupancy (Visual):Occupancy Screen: Display "Daily Occupancy" and "Occupancy Percentage" ($Occupied Rooms / Total Rooms \times 100$) using mobile charts (e.g., Pie or Bar charts).Revenue Stats: Monthly and Yearly breakdowns of Total Revenue and Revenue per Travel Agency.
+
+Logout button not redirecting to login page
+When a input field is clicked to enter the values in mobile application the fields should move up and should not be kept behind the keyboard, this applies to entire application
+Everything should be a new page I don't want anything in the popup windows, like the new booking form esit booking aading agencies adding hotels etc. do the same in entire application
+Icons should be visible accross all platforms
+Date should be a date picker field in entire application once the date is selected the selection popup should close
+
+Admin should be able to see everything but not everything for all hotels in one page there should be a dropdown with hotels and whichever hotel is selcted from dropdown only the data for that hotel should be visible
+
+While adding a hotel there will be a start date and end date, based on that user will be locked from logging into system and a notification should be shown to user saying "Your plan is expired contact the Support team".
+
+All the currecy sign will be indian rupee sign.
+
+There should be a profile page also from where user can update its passwords and name.
+
+Hotel Owner will have an option to Add-Update-Delete user to the hotel in its profile page.
+
+In booking form the Agencies should be a dropdown so will be the Status and Room Types, Total Cost and Due Balance should be at the bottom
+
+Analytics should show the analytic data based on some selections like, Month and Year, Also the selected agencies from dropdown. Occupancy will also show based on the month and year selected, add monthly revenue as well.
+
+In Hotel owner and Hotel Manager dashboard we will show a booking forcast of next 7 days including today under the today checkins and today checkout. Also show todays occupancy as well in a progress bar style if occupancy less than 50% show red bar for less than 90% show orange and for 100% show green.
+
+
+

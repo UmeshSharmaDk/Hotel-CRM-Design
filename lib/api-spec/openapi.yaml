@@ -1,22 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Hotel CRM API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
+  - name: hotels
+  - name: users
+  - name: bookings
+  - name: agencies
+  - name: roomTypes
+  - name: analytics
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,7 +28,626 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /auth/update-profile:
+    put:
+      operationId: updateProfile
+      tags: [auth]
+      summary: Update profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /hotels:
+    get:
+      operationId: getHotels
+      tags: [hotels]
+      summary: List hotels
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of hotels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Hotel"
+    post:
+      operationId: createHotel
+      tags: [hotels]
+      summary: Create hotel
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHotelRequest"
+      responses:
+        "201":
+          description: Hotel created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+
+  /hotels/{id}:
+    put:
+      operationId: updateHotel
+      tags: [hotels]
+      summary: Update hotel
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHotelRequest"
+      responses:
+        "200":
+          description: Hotel updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+    delete:
+      operationId: deleteHotel
+      tags: [hotels]
+      summary: Delete hotel
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Hotel deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /hotels/{hotelId}/users:
+    get:
+      operationId: getHotelUsers
+      tags: [users]
+      summary: Get hotel users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProfile"
+    post:
+      operationId: createHotelUser
+      tags: [users]
+      summary: Create hotel user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /hotels/{hotelId}/users/{userId}:
+    put:
+      operationId: updateHotelUser
+      tags: [users]
+      summary: Update hotel user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+    delete:
+      operationId: deleteHotelUser
+      tags: [users]
+      summary: Delete hotel user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /hotels/{hotelId}/bookings:
+    get:
+      operationId: getBookings
+      tags: [bookings]
+      summary: Get bookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create booking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingRequest"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /hotels/{hotelId}/bookings/{bookingId}:
+    put:
+      operationId: updateBooking
+      tags: [bookings]
+      summary: Update booking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingRequest"
+      responses:
+        "200":
+          description: Booking updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+    delete:
+      operationId: deleteBooking
+      tags: [bookings]
+      summary: Delete booking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /hotels/{hotelId}/agencies:
+    get:
+      operationId: getAgencies
+      tags: [agencies]
+      summary: Get agencies
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of agencies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Agency"
+    post:
+      operationId: createAgency
+      tags: [agencies]
+      summary: Create agency
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAgencyRequest"
+      responses:
+        "201":
+          description: Agency created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agency"
+
+  /hotels/{hotelId}/agencies/{agencyId}:
+    put:
+      operationId: updateAgency
+      tags: [agencies]
+      summary: Update agency
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: agencyId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAgencyRequest"
+      responses:
+        "200":
+          description: Agency updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agency"
+    delete:
+      operationId: deleteAgency
+      tags: [agencies]
+      summary: Delete agency
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: agencyId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Agency deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /hotels/{hotelId}/room-types:
+    get:
+      operationId: getRoomTypes
+      tags: [roomTypes]
+      summary: Get room types
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of room types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoomType"
+    post:
+      operationId: createRoomType
+      tags: [roomTypes]
+      summary: Create room type
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoomTypeRequest"
+      responses:
+        "201":
+          description: Room type created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomType"
+
+  /hotels/{hotelId}/room-types/{roomTypeId}:
+    put:
+      operationId: updateRoomType
+      tags: [roomTypes]
+      summary: Update room type
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: roomTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoomTypeRequest"
+      responses:
+        "200":
+          description: Room type updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomType"
+    delete:
+      operationId: deleteRoomType
+      tags: [roomTypes]
+      summary: Delete room type
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: roomTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room type deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /hotels/{hotelId}/analytics:
+    get:
+      operationId: getAnalytics
+      tags: [analytics]
+      summary: Get analytics
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: month
+          in: query
+          schema:
+            type: integer
+        - name: year
+          in: query
+          schema:
+            type: integer
+        - name: agencyId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analytics"
+
+  /hotels/{hotelId}/forecast:
+    get:
+      operationId: getForecast
+      tags: [analytics]
+      summary: Get 7-day booking forecast
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Forecast data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Forecast"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +657,356 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        planExpired:
+          type: boolean
+      required:
+        - token
+        - user
+        - planExpired
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        hotelId:
+          type: integer
+          nullable: true
+      required:
+        - id
+        - name
+        - email
+        - role
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+
+    Hotel:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        totalRooms:
+          type: integer
+        planStartDate:
+          type: string
+        planEndDate:
+          type: string
+      required:
+        - id
+        - name
+        - totalRooms
+        - planStartDate
+        - planEndDate
+
+    CreateHotelRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        totalRooms:
+          type: integer
+        planStartDate:
+          type: string
+        planEndDate:
+          type: string
+      required:
+        - name
+        - totalRooms
+        - planStartDate
+        - planEndDate
+
+    CreateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+      required:
+        - name
+        - email
+        - password
+        - role
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        password:
+          type: string
+
+    Agency:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        hotelId:
+          type: integer
+      required:
+        - id
+        - name
+        - hotelId
+
+    CreateAgencyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+
+    RoomType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        hotelId:
+          type: integer
+        pricePerNight:
+          type: string
+      required:
+        - id
+        - name
+        - hotelId
+        - pricePerNight
+
+    CreateRoomTypeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        pricePerNight:
+          type: string
+      required:
+        - name
+        - pricePerNight
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        hotelId:
+          type: integer
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+          nullable: true
+        guestPhone:
+          type: string
+          nullable: true
+        roomType:
+          type: string
+        checkIn:
+          type: string
+        checkOut:
+          type: string
+        rooms:
+          type: integer
+        status:
+          type: string
+        agencyId:
+          type: integer
+          nullable: true
+        agencyName:
+          type: string
+          nullable: true
+        totalCost:
+          type: string
+        dueBalance:
+          type: string
+        notes:
+          type: string
+          nullable: true
+      required:
+        - id
+        - hotelId
+        - guestName
+        - roomType
+        - checkIn
+        - checkOut
+        - rooms
+        - status
+        - totalCost
+        - dueBalance
+
+    CreateBookingRequest:
+      type: object
+      properties:
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+        guestPhone:
+          type: string
+        roomType:
+          type: string
+        checkIn:
+          type: string
+        checkOut:
+          type: string
+        rooms:
+          type: integer
+        status:
+          type: string
+        agencyId:
+          type: integer
+          nullable: true
+        totalCost:
+          type: string
+        dueBalance:
+          type: string
+        notes:
+          type: string
+      required:
+        - guestName
+        - roomType
+        - checkIn
+        - checkOut
+        - rooms
+        - status
+        - totalCost
+        - dueBalance
+
+    Analytics:
+      type: object
+      properties:
+        totalBookings:
+          type: integer
+        totalRevenue:
+          type: number
+        monthlyRevenue:
+          type: number
+        occupancyRate:
+          type: number
+        avgStayDuration:
+          type: number
+        bookingsByStatus:
+          type: object
+          additionalProperties:
+            type: integer
+        bookingsByAgency:
+          type: array
+          items:
+            type: object
+            properties:
+              agencyName:
+                type: string
+              count:
+                type: integer
+              revenue:
+                type: number
+            required:
+              - agencyName
+              - count
+              - revenue
+      required:
+        - totalBookings
+        - totalRevenue
+        - monthlyRevenue
+        - occupancyRate
+        - avgStayDuration
+        - bookingsByStatus
+        - bookingsByAgency
+
+    ForecastDay:
+      type: object
+      properties:
+        date:
+          type: string
+        checkIns:
+          type: integer
+        checkOuts:
+          type: integer
+        occupied:
+          type: integer
+      required:
+        - date
+        - checkIns
+        - checkOuts
+        - occupied
+
+    Forecast:
+      type: object
+      properties:
+        todayOccupancy:
+          type: number
+        totalRooms:
+          type: integer
+        occupiedRooms:
+          type: integer
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/ForecastDay"
+      required:
+        - todayOccupancy
+        - totalRooms
+        - occupiedRooms
+        - days
