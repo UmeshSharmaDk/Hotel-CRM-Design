@@ -8,9 +8,14 @@ import {
   TextInputProps,
   View,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/colors";
+
+// Lazy-load the native date picker only on native platforms
+const DateTimePicker =
+  Platform.OS !== "web"
+    ? require("@react-native-community/datetimepicker").default
+    : null;
 
 const C = Colors.light;
 
@@ -64,6 +69,36 @@ export function DateField({ label, value, onChange, minimumDate, error }: DateFi
       })
     : "Select date";
 
+  if (Platform.OS === "web") {
+    const minStr = minimumDate ? minimumDate.toISOString().split("T")[0] : undefined;
+    return (
+      <View style={styles.group}>
+        <Text style={styles.label}>{label}</Text>
+        <View style={[styles.input, styles.dateInput, error && styles.inputError]}>
+          <Feather name="calendar" size={16} color={value ? C.text : C.textMuted} />
+          <input
+            type="date"
+            value={value || ""}
+            min={minStr}
+            onChange={(e) => onChange(e.target.value)}
+            style={{
+              flex: 1,
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              fontSize: 15,
+              fontFamily: "Inter_400Regular, sans-serif",
+              color: value ? C.text : C.textMuted,
+              cursor: "pointer",
+              marginLeft: 8,
+            }}
+          />
+        </View>
+        {error && <Text style={styles.error}>{error}</Text>}
+      </View>
+    );
+  }
+
   return (
     <View style={styles.group}>
       <Text style={styles.label}>{label}</Text>
@@ -75,7 +110,7 @@ export function DateField({ label, value, onChange, minimumDate, error }: DateFi
         <Text style={[styles.dateText, !value && { color: C.textMuted }]}>{displayDate}</Text>
       </Pressable>
       {error && <Text style={styles.error}>{error}</Text>}
-      {show && (
+      {show && DateTimePicker && (
         <DateTimePicker
           value={dateValue}
           mode="date"
