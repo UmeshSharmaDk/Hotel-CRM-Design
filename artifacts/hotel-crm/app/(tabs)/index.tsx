@@ -43,7 +43,11 @@ interface Booking {
   checkIn: string;
   checkOut: string;
   status: string;
+  rooms: number;
+  notes?: string;
   agencyName?: string;
+  totalCost: string;
+  dueBalance: string;
 }
 
 function todayStr() {
@@ -249,13 +253,22 @@ export default function DashboardScreen() {
                 <Text style={styles.noGuestsText}>No check-ins today.</Text>
               ) : (
                 checkInsToday.map((b) => (
-                  <View key={b.id} style={styles.guestRow}>
+                  <Pressable
+                    key={b.id}
+                    style={({ pressed }) => [styles.guestRow, pressed && { backgroundColor: "#F8FAFC" }]}
+                    onPress={() => router.push({ pathname: "/booking/edit", params: { bookingId: b.id, hotelId: selectedHotelId } })}
+                  >
                     <View style={[styles.guestDot, { backgroundColor: "#22C55E" }]} />
                     <View style={{ flex: 1 }}>
                       <Text style={styles.guestName}>{b.guestName}</Text>
-                      <Text style={styles.guestSub}>{b.roomType}{b.agencyName ? ` · ${b.agencyName}` : ""}</Text>
+                      <Text style={styles.guestSub}>
+                        {b.roomType} · {b.rooms} room{b.rooms !== 1 ? "s" : ""}
+                        {b.agencyName ? ` · ${b.agencyName}` : ""}
+                      </Text>
+                      {b.notes ? <Text style={styles.guestNotes} numberOfLines={1}>{b.notes}</Text> : null}
                     </View>
-                  </View>
+                    <Feather name="chevron-right" size={16} color={C.textMuted} />
+                  </Pressable>
                 ))
               )}
             </View>
@@ -272,13 +285,22 @@ export default function DashboardScreen() {
                 <Text style={styles.noGuestsText}>No check-outs today.</Text>
               ) : (
                 checkOutsToday.map((b) => (
-                  <View key={b.id} style={styles.guestRow}>
+                  <Pressable
+                    key={b.id}
+                    style={({ pressed }) => [styles.guestRow, pressed && { backgroundColor: "#F8FAFC" }]}
+                    onPress={() => router.push({ pathname: "/booking/edit", params: { bookingId: b.id, hotelId: selectedHotelId } })}
+                  >
                     <View style={[styles.guestDot, { backgroundColor: "#F97316" }]} />
                     <View style={{ flex: 1 }}>
                       <Text style={styles.guestName}>{b.guestName}</Text>
-                      <Text style={styles.guestSub}>{b.roomType}{b.agencyName ? ` · ${b.agencyName}` : ""}</Text>
+                      <Text style={styles.guestSub}>
+                        {b.roomType} · {b.rooms} room{b.rooms !== 1 ? "s" : ""}
+                        {b.agencyName ? ` · ${b.agencyName}` : ""}
+                      </Text>
+                      {b.notes ? <Text style={styles.guestNotes} numberOfLines={1}>{b.notes}</Text> : null}
                     </View>
-                  </View>
+                    <Feather name="chevron-right" size={16} color={C.textMuted} />
+                  </Pressable>
                 ))
               )}
             </View>
@@ -419,6 +441,7 @@ const styles = StyleSheet.create({
   guestDot: { width: 8, height: 8, borderRadius: 4 },
   guestName: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: C.text },
   guestSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: C.textSecondary, marginTop: 2 },
+  guestNotes: { fontSize: 12, fontFamily: "Inter_400Regular", color: C.textMuted, marginTop: 2, fontStyle: "italic" },
 
   tableCard: {
     backgroundColor: C.card,
