@@ -226,12 +226,24 @@ export default function DashboardScreen() {
               value={checkInsToday.length}
               borderColor="#22C55E"
               icon={<Feather name="log-in" size={22} color="#22C55E" />}
+              onPress={() =>
+                router.push({
+                  pathname: "/(tabs)/bookings",
+                  params: { filterDate: today, filterType: "checkin" },
+                })
+              }
             />
             <StatCard
               label="Today's Check-outs"
               value={checkOutsToday.length}
               borderColor="#F97316"
               icon={<Feather name="log-out" size={22} color="#F97316" />}
+              onPress={() =>
+                router.push({
+                  pathname: "/(tabs)/bookings",
+                  params: { filterDate: today, filterType: "checkout" },
+                })
+              }
             />
             <StatCard
               label="Today's Occupied"
@@ -357,20 +369,29 @@ function StatCard({
   value,
   borderColor,
   icon,
+  onPress,
 }: {
   label: string;
   value: number;
   borderColor: string;
   icon: React.ReactNode;
+  onPress?: () => void;
 }) {
   return (
-    <View style={[styles.statCard, { borderLeftColor: borderColor }]}>
+    <Pressable
+      style={({ pressed }) => [styles.statCard, { borderLeftColor: borderColor }, pressed && { opacity: 0.85 }]}
+      onPress={onPress}
+      disabled={!onPress}
+    >
       <View style={{ flex: 1 }}>
         <Text style={styles.statLabel}>{label}</Text>
         <Text style={[styles.statValue, { color: borderColor }]}>{value}</Text>
       </View>
-      <View style={styles.statIcon}>{icon}</View>
-    </View>
+      <View style={styles.statIcon}>
+        {icon}
+        {onPress && <Feather name="chevron-right" size={14} color={C.textMuted} style={{ marginTop: 4 }} />}
+      </View>
+    </Pressable>
   );
 }
 
