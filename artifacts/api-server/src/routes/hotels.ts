@@ -6,9 +6,17 @@ import { authenticate, requireRole, AuthRequest } from "../lib/auth.js";
 
 const router = Router();
 
-router.get("/", authenticate, requireRole("admin"), async (_req, res) => {
-  const hotels = await db.select().from(hotelsTable);
-  res.json(hotels);
+router.get("/", authenticate, async (req: AuthRequest, res) => {
+  const user = req.user!;
+  if (user.role === "admin") {
+    const hotels = await db.select().from(hotelsTable);
+    res.json(hotels);
+  } else if (user.hotelId) {
+    const hotels = await db.select().from(hotelsTable).where(eq(hotelsTable.id, user.hotelId));
+    res.json(hotels);
+  } else {
+    res.json([]);
+  }
 });
 
 router.post("/", authenticate, requireRole("admin"), async (req, res) => {
