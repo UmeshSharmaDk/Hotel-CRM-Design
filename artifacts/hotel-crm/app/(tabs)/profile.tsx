@@ -31,7 +31,12 @@ export default function ProfileScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (Platform.OS === "web") {
+      await logout();
+      router.replace("/login");
+      return;
+    }
     Alert.alert("Logout", "Are you sure?", [
       { text: "Cancel", style: "cancel" },
       {

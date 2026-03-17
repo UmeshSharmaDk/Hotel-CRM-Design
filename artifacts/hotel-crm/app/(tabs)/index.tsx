@@ -107,7 +107,12 @@ export default function DashboardScreen() {
     setRefreshing(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (Platform.OS === "web") {
+      await logout();
+      router.replace("/login");
+      return;
+    }
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
       {
