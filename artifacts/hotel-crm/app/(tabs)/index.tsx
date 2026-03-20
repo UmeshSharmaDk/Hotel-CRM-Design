@@ -65,12 +65,17 @@ function formatHeaderDate() {
 
 function formatTableDate(dateStr: string) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 export default function DashboardScreen() {
   const { user, planExpired, logout } = useAuth();
-  const { hotels, selectedHotel, selectedHotelId, selectHotel, loading } = useHotelContext();
+  const { hotels, selectedHotel, selectedHotelId, selectHotel, loading } =
+    useHotelContext();
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const [forecast, setForecast] = useState<ForecastData | null>(null);
@@ -81,7 +86,7 @@ export default function DashboardScreen() {
   useFocusEffect(
     useCallback(() => {
       if (selectedHotelId) loadAll();
-    }, [selectedHotelId])
+    }, [selectedHotelId]),
   );
 
   const loadAll = async () => {
@@ -128,17 +133,20 @@ export default function DashboardScreen() {
 
   const today = todayStr();
   const checkInsToday = bookings.filter(
-    (b) => b.checkIn === today && b.status !== "cancelled"
+    (b) => b.checkIn === today && b.status !== "cancelled",
   );
   const checkOutsToday = bookings.filter(
-    (b) => b.checkOut === today && b.status !== "cancelled"
+    (b) => b.checkOut === today && b.status !== "cancelled",
   );
 
   const totalRooms = forecast?.totalRooms ?? selectedHotel?.totalRooms ?? 0;
   const occupiedRooms = forecast?.occupiedRooms ?? 0;
   const vacantRooms = totalRooms - occupiedRooms;
 
-  const hotelOptions = hotels.map((h) => ({ label: h.name, value: h.id.toString() }));
+  const hotelOptions = hotels.map((h) => ({
+    label: h.name,
+    value: h.id.toString(),
+  }));
 
   if (planExpired) {
     return (
@@ -149,7 +157,8 @@ export default function DashboardScreen() {
           </View>
           <Text style={styles.expiredTitle}>Plan Expired</Text>
           <Text style={styles.expiredText}>
-            Your plan is expired. Contact the Support team to renew your subscription.
+            Your plan is expired. Contact the Support team to renew your
+            subscription.
           </Text>
           <Pressable style={styles.logoutBtn} onPress={handleLogout}>
             <Text style={styles.logoutBtnText}>Logout</Text>
@@ -166,7 +175,13 @@ export default function DashboardScreen() {
         styles.container,
         { paddingTop: topPad, paddingBottom: insets.bottom + 90 },
       ]}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={C.primary} />}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          tintColor={C.primary}
+        />
+      }
     >
       {/* Header */}
       <View style={styles.header}>
@@ -179,7 +194,12 @@ export default function DashboardScreen() {
         {selectedHotelId ? (
           <Pressable
             style={styles.newBookingBtn}
-            onPress={() => router.push({ pathname: "/booking/add", params: { hotelId: selectedHotelId } })}
+            onPress={() =>
+              router.push({
+                pathname: "/booking/add",
+                params: { hotelId: selectedHotelId },
+              })
+            }
           >
             <Feather name="plus" size={14} color="#fff" />
             <Text style={styles.newBookingText}>New Booking</Text>
@@ -205,17 +225,24 @@ export default function DashboardScreen() {
         <View style={styles.emptyState}>
           <Feather name="home" size={40} color={C.textMuted} />
           <Text style={styles.emptyText}>
-            {hotels.length === 0 ? "No hotels configured yet" : "Select a hotel to view dashboard"}
+            {hotels.length === 0
+              ? "No hotels configured yet"
+              : "Select a hotel to view dashboard"}
           </Text>
           {user?.role === "admin" && (
-            <Pressable style={styles.ctaBtn} onPress={() => router.push("/hotel/add")}>
+            <Pressable
+              style={styles.ctaBtn}
+              onPress={() => router.push("/hotel/add")}
+            >
               <Text style={styles.ctaBtnText}>Add Hotel</Text>
             </Pressable>
           )}
         </View>
       )}
 
-      {dataLoading && <ActivityIndicator color={C.primary} style={{ marginVertical: 32 }} />}
+      {dataLoading && (
+        <ActivityIndicator color={C.primary} style={{ marginVertical: 32 }} />
+      )}
 
       {!dataLoading && selectedHotel && (
         <>
@@ -249,13 +276,25 @@ export default function DashboardScreen() {
               label="Today's Occupied"
               value={occupiedRooms}
               borderColor={C.primary}
-              icon={<MaterialCommunityIcons name="bed" size={22} color={C.primary} />}
+              icon={
+                <MaterialCommunityIcons
+                  name="bed"
+                  size={22}
+                  color={C.primary}
+                />
+              }
             />
             <StatCard
               label="Today's Vacant"
               value={vacantRooms}
               borderColor="#8B5CF6"
-              icon={<MaterialCommunityIcons name="office-building-outline" size={22} color="#8B5CF6" />}
+              icon={
+                <MaterialCommunityIcons
+                  name="office-building-outline"
+                  size={22}
+                  color="#8B5CF6"
+                />
+              }
             />
           </View>
 
@@ -272,19 +311,37 @@ export default function DashboardScreen() {
                 checkInsToday.map((b) => (
                   <Pressable
                     key={b.id}
-                    style={({ pressed }) => [styles.guestRow, pressed && { backgroundColor: "#F8FAFC" }]}
-                    onPress={() => router.push({ pathname: "/booking/edit", params: { bookingId: b.id, hotelId: selectedHotelId } })}
+                    style={({ pressed }) => [
+                      styles.guestRow,
+                      pressed && { backgroundColor: "#F8FAFC" },
+                    ]}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/booking/edit",
+                        params: { bookingId: b.id, hotelId: selectedHotelId },
+                      })
+                    }
                   >
-                    <View style={[styles.guestDot, { backgroundColor: "#22C55E" }]} />
+                    <View
+                      style={[styles.guestDot, { backgroundColor: "#22C55E" }]}
+                    />
                     <View style={{ flex: 1 }}>
                       <Text style={styles.guestName}>{b.guestName}</Text>
                       <Text style={styles.guestSub}>
                         {b.roomType} · {b.rooms} room{b.rooms !== 1 ? "s" : ""}
                         {b.agencyName ? ` · ${b.agencyName}` : ""}
                       </Text>
-                      {b.notes ? <Text style={styles.guestNotes} numberOfLines={1}>{b.notes}</Text> : null}
+                      {b.notes ? (
+                        <Text style={styles.guestNotes} numberOfLines={1}>
+                          {b.notes}
+                        </Text>
+                      ) : null}
                     </View>
-                    <Feather name="chevron-right" size={16} color={C.textMuted} />
+                    <Feather
+                      name="chevron-right"
+                      size={16}
+                      color={C.textMuted}
+                    />
                   </Pressable>
                 ))
               )}
@@ -304,19 +361,37 @@ export default function DashboardScreen() {
                 checkOutsToday.map((b) => (
                   <Pressable
                     key={b.id}
-                    style={({ pressed }) => [styles.guestRow, pressed && { backgroundColor: "#F8FAFC" }]}
-                    onPress={() => router.push({ pathname: "/booking/edit", params: { bookingId: b.id, hotelId: selectedHotelId } })}
+                    style={({ pressed }) => [
+                      styles.guestRow,
+                      pressed && { backgroundColor: "#F8FAFC" },
+                    ]}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/booking/edit",
+                        params: { bookingId: b.id, hotelId: selectedHotelId },
+                      })
+                    }
                   >
-                    <View style={[styles.guestDot, { backgroundColor: "#F97316" }]} />
+                    <View
+                      style={[styles.guestDot, { backgroundColor: "#F97316" }]}
+                    />
                     <View style={{ flex: 1 }}>
                       <Text style={styles.guestName}>{b.guestName}</Text>
                       <Text style={styles.guestSub}>
                         {b.roomType} · {b.rooms} room{b.rooms !== 1 ? "s" : ""}
                         {b.agencyName ? ` · ${b.agencyName}` : ""}
                       </Text>
-                      {b.notes ? <Text style={styles.guestNotes} numberOfLines={1}>{b.notes}</Text> : null}
+                      {b.notes ? (
+                        <Text style={styles.guestNotes} numberOfLines={1}>
+                          {b.notes}
+                        </Text>
+                      ) : null}
                     </View>
-                    <Feather name="chevron-right" size={16} color={C.textMuted} />
+                    <Feather
+                      name="chevron-right"
+                      size={16}
+                      color={C.textMuted}
+                    />
                   </Pressable>
                 ))
               )}
@@ -328,31 +403,85 @@ export default function DashboardScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Feather name="calendar" size={16} color={C.text} />
-                <Text style={styles.sectionTitle}>7-Day Occupancy Forecast</Text>
+                <Text style={styles.sectionTitle}>
+                  7-Day Occupancy Forecast
+                </Text>
               </View>
               <View style={styles.tableCard}>
                 {/* Table header */}
                 <View style={[styles.tableRow, styles.tableHeaderRow]}>
-                  <Text style={[styles.tableCell, styles.tableHeader, { flex: 2 }]}>Date</Text>
-                  <Text style={[styles.tableCell, styles.tableHeader]}>Occupied</Text>
-                  <Text style={[styles.tableCell, styles.tableHeader]}>Vacant</Text>
-                  <Text style={[styles.tableCell, styles.tableHeader]}>Check-ins</Text>
+                  <Text
+                    style={[styles.tableCell, styles.tableHeader, { flex: 2 }]}
+                  >
+                    Date
+                  </Text>
+                  <Text style={[styles.tableCell, styles.tableHeader]}>
+                    Occupied
+                  </Text>
+                  <Text style={[styles.tableCell, styles.tableHeader]}>
+                    Vacant
+                  </Text>
+                  <Text style={[styles.tableCell, styles.tableHeader]}>
+                    Check-ins
+                  </Text>
                 </View>
                 {forecast.days.map((day, idx) => {
                   const vacant = totalRooms - day.occupied;
                   const isToday = idx === 0;
                   return (
-                    <View
+                    <Pressable
                       key={day.date}
-                      style={[styles.tableRow, idx < forecast.days.length - 1 && styles.tableRowBorder, isToday && styles.tableRowToday]}
+                      style={({ pressed }) => [
+                        styles.tableRow,
+                        idx < forecast.days.length - 1 && styles.tableRowBorder,
+                        isToday && styles.tableRowToday,
+                        pressed && { backgroundColor: "#F8FAFC" },
+                      ]}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/(tabs)/bookings",
+                          params: { filterDate: day.date },
+                        })
+                      }
                     >
-                      <Text style={[styles.tableCell, styles.tableDateCell, { flex: 2 }, isToday && { color: C.primary, fontFamily: "Inter_600SemiBold" }]}>
+                      <Text
+                        style={[
+                          styles.tableCell,
+                          styles.tableDateCell,
+                          { flex: 2 },
+                          isToday && {
+                            color: C.primary,
+                            fontFamily: "Inter_600SemiBold",
+                          },
+                        ]}
+                      >
                         {formatTableDate(day.date)}
                       </Text>
-                      <Text style={[styles.tableCell, styles.tableValue]}>{day.occupied}</Text>
-                      <Text style={[styles.tableCell, styles.tableValue]}>{vacant}</Text>
-                      <Text style={[styles.tableCell, styles.tableValue]}>{day.checkIns}</Text>
-                    </View>
+                      <Text style={[styles.tableCell, styles.tableValue]}>
+                        {day.occupied}
+                      </Text>
+                      <Text style={[styles.tableCell, styles.tableValue]}>
+                        {vacant}
+                      </Text>
+                      <View
+                        style={[
+                          styles.tableCell,
+                          {
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 4,
+                          },
+                        ]}
+                      >
+                        <Text style={styles.tableValue}>{day.checkIns}</Text>
+                        <Feather
+                          name="chevron-right"
+                          size={12}
+                          color={C.textMuted}
+                        />
+                      </View>
+                    </Pressable>
                   );
                 })}
               </View>
@@ -379,7 +508,11 @@ function StatCard({
 }) {
   return (
     <Pressable
-      style={({ pressed }) => [styles.statCard, { borderLeftColor: borderColor }, pressed && { opacity: 0.85 }]}
+      style={({ pressed }) => [
+        styles.statCard,
+        { borderLeftColor: borderColor },
+        pressed && { opacity: 0.85 },
+      ]}
       onPress={onPress}
       disabled={!onPress}
     >
@@ -389,7 +522,14 @@ function StatCard({
       </View>
       <View style={styles.statIcon}>
         {icon}
-        {onPress && <Feather name="chevron-right" size={14} color={C.textMuted} style={{ marginTop: 4 }} />}
+        {onPress && (
+          <Feather
+            name="chevron-right"
+            size={14}
+            color={C.textMuted}
+            style={{ marginTop: 4 }}
+          />
+        )}
       </View>
     </Pressable>
   );
@@ -407,7 +547,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   hotelTitle: { fontSize: 22, fontFamily: "Inter_700Bold", color: C.text },
-  headerDate: { fontSize: 13, fontFamily: "Inter_400Regular", color: C.textSecondary, marginTop: 2 },
+  headerDate: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: C.textSecondary,
+    marginTop: 2,
+  },
   newBookingBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -417,7 +562,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
   },
-  newBookingText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  newBookingText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
 
   hotelSelector: { marginBottom: 8 },
 
@@ -432,14 +581,28 @@ const styles = StyleSheet.create({
     borderColor: C.border,
     borderLeftWidth: 4,
   },
-  statLabel: { fontSize: 13, fontFamily: "Inter_400Regular", color: C.textSecondary, marginBottom: 6 },
+  statLabel: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: C.textSecondary,
+    marginBottom: 6,
+  },
   statValue: { fontSize: 28, fontFamily: "Inter_700Bold" },
   statIcon: { opacity: 0.8 },
 
   section: { marginBottom: 20 },
-  sectionHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 10,
+  },
   dot: { width: 10, height: 10, borderRadius: 5 },
-  sectionTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: C.text },
+  sectionTitle: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    color: C.text,
+  },
 
   guestListCard: {
     backgroundColor: C.card,
@@ -466,8 +629,19 @@ const styles = StyleSheet.create({
   },
   guestDot: { width: 8, height: 8, borderRadius: 4 },
   guestName: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: C.text },
-  guestSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: C.textSecondary, marginTop: 2 },
-  guestNotes: { fontSize: 12, fontFamily: "Inter_400Regular", color: C.textMuted, marginTop: 2, fontStyle: "italic" },
+  guestSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: C.textSecondary,
+    marginTop: 2,
+  },
+  guestNotes: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: C.textMuted,
+    marginTop: 2,
+    fontStyle: "italic",
+  },
 
   tableCard: {
     backgroundColor: C.card,
@@ -493,12 +667,26 @@ const styles = StyleSheet.create({
     borderBottomColor: C.border,
   },
   tableCell: { flex: 1, textAlign: "center" },
-  tableHeader: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: C.textSecondary },
-  tableDateCell: { fontSize: 13, fontFamily: "Inter_400Regular", color: C.text, textAlign: "left" },
+  tableHeader: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+    color: C.textSecondary,
+  },
+  tableDateCell: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: C.text,
+    textAlign: "left",
+  },
   tableValue: { fontSize: 14, fontFamily: "Inter_500Medium", color: C.text },
 
   emptyState: { alignItems: "center", paddingVertical: 60, gap: 12 },
-  emptyText: { fontSize: 15, fontFamily: "Inter_400Regular", color: C.textSecondary, textAlign: "center" },
+  emptyText: {
+    fontSize: 15,
+    fontFamily: "Inter_400Regular",
+    color: C.textSecondary,
+    textAlign: "center",
+  },
   ctaBtn: {
     backgroundColor: C.primary,
     borderRadius: 12,
@@ -508,7 +696,13 @@ const styles = StyleSheet.create({
   },
   ctaBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#fff" },
 
-  expiredContainer: { flex: 1, backgroundColor: C.background, alignItems: "center", justifyContent: "center", padding: 20 },
+  expiredContainer: {
+    flex: 1,
+    backgroundColor: C.background,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
   expiredCard: {
     backgroundColor: C.card,
     borderRadius: 20,
@@ -517,8 +711,29 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   expiredIcon: { marginBottom: 16 },
-  expiredTitle: { fontSize: 22, fontFamily: "Inter_700Bold", color: C.text, marginBottom: 12 },
-  expiredText: { fontSize: 15, fontFamily: "Inter_400Regular", color: C.textSecondary, textAlign: "center", marginBottom: 24, lineHeight: 22 },
-  logoutBtn: { backgroundColor: C.danger, borderRadius: 12, paddingVertical: 14, paddingHorizontal: 32 },
-  logoutBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  expiredTitle: {
+    fontSize: 22,
+    fontFamily: "Inter_700Bold",
+    color: C.text,
+    marginBottom: 12,
+  },
+  expiredText: {
+    fontSize: 15,
+    fontFamily: "Inter_400Regular",
+    color: C.textSecondary,
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  logoutBtn: {
+    backgroundColor: C.danger,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+  },
+  logoutBtnText: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
 });
