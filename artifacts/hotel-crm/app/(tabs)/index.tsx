@@ -408,23 +408,57 @@ export default function DashboardScreen() {
                 </Text>
               </View>
               <View style={styles.tableCard}>
-                {/* Table header */}
-                <View style={[styles.tableRow, styles.tableHeaderRow]}>
+                {/* Updated Header with left alignment and spacing */}
+                <View
+                  style={[styles.tableRow, styles.tableHeaderRow, { gap: 8 }]}
+                >
                   <Text
-                    style={[styles.tableCell, styles.tableHeader, { flex: 2 }]}
+                    style={[
+                      styles.tableCell,
+                      styles.tableHeader,
+                      { textAlign: "left" },
+                    ]}
                   >
                     Date
                   </Text>
-                  <Text style={[styles.tableCell, styles.tableHeader]}>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      styles.tableHeader,
+                      { textAlign: "left" },
+                    ]}
+                  >
                     Occupied
                   </Text>
-                  <Text style={[styles.tableCell, styles.tableHeader]}>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      styles.tableHeader,
+                      { textAlign: "left" },
+                    ]}
+                  >
                     Vacant
                   </Text>
-                  <Text style={[styles.tableCell, styles.tableHeader]}>
-                    Check-ins
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      styles.tableHeader,
+                      { textAlign: "left" },
+                    ]}
+                  >
+                    Check-In
+                  </Text>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      styles.tableHeader,
+                      { textAlign: "left" },
+                    ]}
+                  >
+                    Check-Out
                   </Text>
                 </View>
+
                 {forecast.days.map((day, idx) => {
                   const vacant = totalRooms - day.occupied;
                   const isToday = idx === 0;
@@ -433,6 +467,7 @@ export default function DashboardScreen() {
                       key={day.date}
                       style={({ pressed }) => [
                         styles.tableRow,
+                        { gap: 8 },
                         idx < forecast.days.length - 1 && styles.tableRowBorder,
                         isToday && styles.tableRowToday,
                         pressed && { backgroundColor: "#F8FAFC" },
@@ -448,7 +483,7 @@ export default function DashboardScreen() {
                         style={[
                           styles.tableCell,
                           styles.tableDateCell,
-                          { flex: 2 },
+                          { flex: 1.4 },
                           isToday && {
                             color: C.primary,
                             fontFamily: "Inter_600SemiBold",
@@ -457,30 +492,24 @@ export default function DashboardScreen() {
                       >
                         {formatTableDate(day.date)}
                       </Text>
-                      <Text style={[styles.tableCell, styles.tableValue]}>
+                      <Text
+                        style={[
+                          styles.tableCell,
+                          styles.tableValue,
+                          { flex: 0.8 },
+                        ]}
+                      >
                         {day.occupied}
                       </Text>
                       <Text style={[styles.tableCell, styles.tableValue]}>
                         {vacant}
                       </Text>
-                      <View
-                        style={[
-                          styles.tableCell,
-                          {
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: 4,
-                          },
-                        ]}
-                      >
-                        <Text style={styles.tableValue}>{day.checkIns}</Text>
-                        <Feather
-                          name="chevron-right"
-                          size={12}
-                          color={C.textMuted}
-                        />
-                      </View>
+                      <Text style={[styles.tableCell, styles.tableValue]}>
+                        {day.checkIns}
+                      </Text>
+                      <Text style={[styles.tableCell, styles.tableValue]}>
+                        {day.checkOuts}
+                      </Text>
                     </Pressable>
                   );
                 })}
@@ -668,7 +697,7 @@ const styles = StyleSheet.create({
   },
   tableCell: { flex: 1, textAlign: "center" },
   tableHeader: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: "Inter_600SemiBold",
     color: C.textSecondary,
   },

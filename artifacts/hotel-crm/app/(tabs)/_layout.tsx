@@ -71,7 +71,9 @@ function ClassicTabLayout() {
               style={StyleSheet.absoluteFill}
             />
           ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: C.card }]} />
+            <View
+              style={[StyleSheet.absoluteFill, { backgroundColor: C.card }]}
+            />
           ),
         tabBarLabelStyle: {
           fontFamily: "Inter_500Medium",
@@ -102,6 +104,14 @@ function ClassicTabLayout() {
               <Feather name="calendar" size={22} color={color} />
             ),
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            navigation.navigate("bookings", {
+              filterDate: undefined,
+              filterType: undefined,
+            });
+          },
+        })}
       />
       {user?.role === "admin" || user?.role === "hotel_owner" ? (
         <Tabs.Screen
@@ -110,17 +120,22 @@ function ClassicTabLayout() {
             title: "Manage",
             tabBarIcon: ({ color }) =>
               isIOS ? (
-                <SymbolView name="building.2.fill" tintColor={color} size={24} />
+                <SymbolView
+                  name="building.2.fill"
+                  tintColor={color}
+                  size={24}
+                />
               ) : (
-                <MaterialCommunityIcons name="office-building" size={22} color={color} />
+                <MaterialCommunityIcons
+                  name="office-building"
+                  size={22}
+                  color={color}
+                />
               ),
           }}
         />
       ) : (
-        <Tabs.Screen
-          name="manage"
-          options={{ href: null }}
-        />
+        <Tabs.Screen name="manage" options={{ href: null }} />
       )}
       <Tabs.Screen
         name="analytics"

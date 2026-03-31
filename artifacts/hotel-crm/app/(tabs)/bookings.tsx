@@ -188,34 +188,31 @@ export default function BookingsScreen() {
   const navigation = useNavigation();
 
   // 3. Define a comprehensive reset function
-  const resetAllFilters = useCallback(() => {
+  const resetAll = useCallback(() => {
     setSearch("");
     setFilterMonth("");
     setFilterYear("");
     setFilterAgency("");
     setSortBy("checkin_desc");
     setShowFilters(false);
+    // Remove params from the URL/Navigator
     router.setParams({ filterDate: "", filterType: "" });
   }, []);
 
   // 4. Add the tab press listener
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("tabPress", () => {
-      resetAllFilters();
-    });
-
-    return unsubscribe;
-  }, [navigation, resetAllFilters]);
-
-  useEffect(() => {
-    if (params.filterDate) {
-      const d = new Date(params.filterDate);
-      setFilterMonth((d.getMonth() + 1).toString());
-      setFilterYear(d.getFullYear().toString());
-      //setShowFilters(true);
-    }
-  }, [params.filterDate, params.filterType]);
-
+  useFocusEffect(
+    useCallback(() => {
+      if (!params.filterDate) {
+        resetAll();
+      } else {
+        // If coming from Dashboard Forecast, auto-open filter panel for context
+        const d = new Date(params.filterDate);
+        setFilterMonth((d.getMonth() + 1).toString());
+        setFilterYear(d.getFullYear().toString());
+        setShowFilters(false);
+      }
+    }, [params.filterDate]),
+  );
   useFocusEffect(
     useCallback(() => {
       if (selectedHotelId) {
@@ -304,17 +301,14 @@ export default function BookingsScreen() {
         return false;
     }
 
-    // Dashboard navigation filters
+    // Dashboard Forecast Navigation
     if (params.filterDate) {
       if (params.filterType === "checkin") {
         if (b.checkIn !== params.filterDate) return false;
       } else if (params.filterType === "checkout") {
         if (b.checkOut !== params.filterDate) return false;
       } else {
-        /** * Forecast Logic:
-         * Show bookings where the guest is present on the selected date.
-         * This includes check-ins, check-outs, and multi-day stays.
-         */
+        // Occupancy Mode: Guest is in the hotel on this date
         if (params.filterDate < b.checkIn || params.filterDate > b.checkOut) {
           return false;
         }
@@ -345,7 +339,9 @@ export default function BookingsScreen() {
         return 0;
     }
   });
-
+  const handleClearFiltersPress = () => {
+    resetAll();
+  };
   if (!selectedHotelId) {
     return (
       <View style={[styles.center, { paddingTop: topPad }]}>
@@ -366,15 +362,10 @@ export default function BookingsScreen() {
                 ? "Check-ins"
                 : params.filterType === "checkout"
                   ? "Check-outs"
-                  : "Occupancy/Stay"}{" "}
+                  : "Stays"}{" "}
               for {formatDate(params.filterDate)}
               {"  "}
-              <Text
-                style={{ color: C.primary }}
-                onPress={() =>
-                  router.setParams({ filterDate: "", filterType: "" })
-                }
-              >
+              <Text style={{ color: C.primary }} onPress={resetAll}>
                 Clear
               </Text>
             </Text>
