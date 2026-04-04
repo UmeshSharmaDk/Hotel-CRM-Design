@@ -1,7 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const domain = process.env.EXPO_PUBLIC_DOMAIN;
-const BASE_URL = domain ? `https://${domain}/api` : "/api";
+const BASE_URL = apiUrl
+  ? apiUrl.replace(/\/$/, "")
+  : domain
+    ? domain.startsWith("http")
+      ? `${domain.replace(/\/$/, "")}/api`
+      : `http://${domain.replace(/\/$/, "")}/api`
+    : "http://192.168.1.105:3000/api";
 
 export async function apiRequest<T>(
   method: string,

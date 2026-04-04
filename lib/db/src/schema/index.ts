@@ -18,7 +18,7 @@ export const usersTable = pgTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  role: userRoleEnum("role").notNull(),
+  role: userRoleEnum("role").notNull().default("hotel_manager"),
   hotelId: integer("hotel_id").references(() => hotelsTable.id),
   createdAt: timestamp("created_at").defaultNow(),
 });

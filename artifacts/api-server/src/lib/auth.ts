@@ -14,6 +14,16 @@ declare module "express-session" {
   }
 }
 
+// Define AuthRequest interface for authenticated routes
+export interface AuthRequest extends Request {
+  user: {
+    userId: number;
+    email: string;
+    role: string;
+    hotelId: number | null;
+  };
+}
+
 export function hashPassword(password: string): string {
   return bcrypt.hashSync(password, 10);
 }
@@ -28,6 +38,8 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
+  // Set req.user from session data for use in routes
+  (req as AuthRequest).user = req.session.user;
   next();
 }
 

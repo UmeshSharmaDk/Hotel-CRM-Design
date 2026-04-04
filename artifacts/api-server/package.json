@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development tsx ./src/index.ts",
+    "dev": "cross-env NODE_ENV=development tsx ./src/index.ts",
     "build": "tsx ./build.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -14,6 +14,7 @@
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2",
+    "dotenv": "^17.4.0",
     "drizzle-orm": "catalog:",
     "express": "^5",
     "express-session": "^1.17.0",
@@ -27,6 +28,7 @@
     "@types/express-session": "^1.17.8",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "catalog:",
+    "cross-env": "^10.1.0",
     "esbuild": "^0.27.3",
     "tsx": "catalog:"
   }
