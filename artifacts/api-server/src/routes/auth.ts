@@ -2,13 +2,7 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { usersTable, hotelsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import {
-  authenticate,
-  comparePassword,
-  generateToken,
-  hashPassword,
-  AuthRequest,
-} from "../lib/auth.js";
+import { authenticate, comparePassword, hashPassword } from "../lib/auth.js";
 
 const router = Router();
 
@@ -39,15 +33,15 @@ router.post("/login", async (req, res) => {
     }
   }
 
-  const token = generateToken({
+  // Set the session state. Express automatically sends the set-cookie header.
+  req.session.user = {
     userId: user.id,
     email: user.email,
     role: user.role,
     hotelId: user.hotelId ?? null,
-  });
+  };
 
   res.json({
-    token,
     user: {
       id: user.id,
       name: user.name,
@@ -59,14 +53,28 @@ router.post("/login", async (req, res) => {
   });
 });
 
-router.get("/me", authenticate, async (req: AuthRequest, res) => {
-  const userId = req.user!.userId;
+router.post("/logout", authenticate, (req, res) => {
+  // Instantly revokes the session on the server
+  req.session.destroy((err) => {
+    if (err) {
+      res.status(500).json({ message: "Could not log out" });
+      return;
+    }
+    res.clearCookie("hotel.sid");
+    res.json({ message: "Logged out successfully" });
+  });
+});
+
+router.get("/me", authenticate, async (req, res) => {
+  const userId = req.session.user!.userId;
   const users = await db.select().from(usersTable).where(eq(usersTable.id, userId));
   const user = users[0];
+
   if (!user) {
     res.status(404).json({ message: "User not found" });
     return;
   }
+
   res.json({
     id: user.id,
     name: user.name,
@@ -76,12 +84,13 @@ router.get("/me", authenticate, async (req: AuthRequest, res) => {
   });
 });
 
-router.put("/update-profile", authenticate, async (req: AuthRequest, res) => {
-  const userId = req.user!.userId;
+router.put("/update-profile", authenticate, async (req, res) => {
+  const userId = req.session.user!.userId;
   const { name, currentPassword, newPassword } = req.body;
 
   const users = await db.select().from(usersTable).where(eq(usersTable.id, userId));
   const user = users[0];
+
   if (!user) {
     res.status(404).json({ message: "User not found" });
     return;

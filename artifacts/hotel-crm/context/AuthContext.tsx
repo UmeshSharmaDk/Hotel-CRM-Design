@@ -14,7 +14,6 @@ export interface User {
 
 interface AuthContextValue {
   user: User | null;
-  token: string | null;
   isLoading: boolean;
   planExpired: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -26,16 +25,14 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [planExpired, setPlanExpired] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const storedToken = await AsyncStorage.getItem("auth_token");
+      // Tokens are handled by cookies now; we only restore local user metadata
       const storedUser = await AsyncStorage.getItem("auth_user");
-      if (storedToken && storedUser) {
-        setToken(storedToken);
+      if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
       setIsLoading(false);
@@ -43,21 +40,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const res = await api.post<{ token: string; user: User; planExpired: boolean }>(
+    const res = await api.post<{ user: User; planExpired: boolean }>(
       "/auth/login",
       { email, password }
     );
-    await AsyncStorage.setItem("auth_token", res.token);
+
     await AsyncStorage.setItem("auth_user", JSON.stringify(res.user));
-    setToken(res.token);
     setUser(res.user);
     setPlanExpired(res.planExpired);
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem("auth_token");
+    try {
+      // Call the server to destroy the session instantly
+      await api.post("/auth/logout", {});
+    } catch {
+      // Ignore network errors on logout, proceed to clear local state
+    }
+
     await AsyncStorage.removeItem("auth_user");
-    setToken(null);
     setUser(null);
     setPlanExpired(false);
   };
@@ -68,12 +69,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData);
       await AsyncStorage.setItem("auth_user", JSON.stringify(userData));
     } catch {
-      // ignore
+      // If /me fails (e.g., cookie expired), clear the local user state
+      await logout();
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, planExpired, login, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, isLoading, planExpired, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
