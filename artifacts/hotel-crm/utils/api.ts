@@ -15,19 +15,21 @@ export async function apiRequest<T>(
   path: string,
   body?: unknown
 ): Promise<T> {
-  const token = await AsyncStorage.getItem("auth_token");
-
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
+    credentials: "include", // CRITICAL: This tells fetch to send the HttpOnly session cookie
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
   });
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: "Network error" }));
+    // Safely handle non-JSON error pages (like 401s or HTML 500s) to prevent the "Unexpected character <" crash
+    const err = await res.text().then(text => {
+      try { return JSON.parse(text); }
+      catch { return { message: `HTTP ${res.status}: Unauthorized or Server Error` }; }
+    });
     throw new Error(err.message || "Request failed");
   }
 

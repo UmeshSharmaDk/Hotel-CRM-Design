@@ -60,7 +60,7 @@ export default function AddBookingScreen() {
       ]);
       setAgencies(ag);
       setRoomTypes(rt);
-    } catch {}
+    } catch { }
   };
 
   const set = (key: string, val: string) => setForm((f) => ({ ...f, [key]: val }));
@@ -68,6 +68,10 @@ export default function AddBookingScreen() {
   const handleSave = async () => {
     if (!form.guestName || !form.roomType || !form.checkIn || !form.checkOut || !form.totalCost) {
       Alert.alert("Error", "Fill all required fields");
+      return;
+    }
+    if (!hotelId || hotelId === 'undefined') {
+      Alert.alert("Error", "No hotel selected. Please go back and try again.");
       return;
     }
     setSaving(true);
@@ -138,7 +142,7 @@ export default function AddBookingScreen() {
           onPress={handleSave}
           disabled={saving}
         >
-          {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Save Booking</Text>}
+          {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Save New Booking</Text>}
         </Pressable>
       </KeyboardAwareScrollView>
     </View>

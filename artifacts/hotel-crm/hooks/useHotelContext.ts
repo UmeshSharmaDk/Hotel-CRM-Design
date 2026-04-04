@@ -1,3 +1,4 @@
+// artifacts/hotel-crm/hooks/useHotelContext.ts
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "@/context/AuthContext";
@@ -22,11 +23,20 @@ export function useHotelContext() {
   }, [user]);
 
   const loadHotels = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log("[HotelContext] No user found, skipping fetch.");
+      return;
+    }
+
     setLoading(true);
+    console.log(`[HotelContext] Fetching hotels for ${user.email} (Role: ${user.role})...`);
+
     try {
+      // Fetch data from the API
+      const data = await api.get<Hotel[]>("/hotels");
+      console.log("[HotelContext] API Response received:", data);
+
       if (user.role === "admin") {
-        const data = await api.get<Hotel[]>("/hotels");
         setHotels(data);
         const stored = await AsyncStorage.getItem("selected_hotel_id");
         if (stored && data.find((h) => h.id === parseInt(stored))) {
@@ -35,13 +45,15 @@ export function useHotelContext() {
           setSelectedHotelId(data[0].id);
         }
       } else if (user.hotelId) {
-        const data = await api.get<Hotel[]>("/hotels");
         const myHotel = data.filter((h) => h.id === user.hotelId);
         setHotels(myHotel.length > 0 ? myHotel : []);
         setSelectedHotelId(user.hotelId);
+      } else {
+        console.warn("[HotelContext] User is not admin and has no hotelId.");
+        setHotels([]);
       }
-    } catch {
-      // ignore
+    } catch (error) {
+      console.error("[HotelContext] FATAL: Failed to fetch hotels from API:", error);
     } finally {
       setLoading(false);
     }

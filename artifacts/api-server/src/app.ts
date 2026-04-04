@@ -7,7 +7,12 @@ const app: Express = express();
 
 app.use(
     cors({
-        origin: process.env.CLIENT_URL || true,
+        origin: [
+            "http://localhost:8081",
+            "http://localhost:8082",
+            "http://192.168.1.105:8081",
+            "http://192.168.1.105:8082"
+        ],
         credentials: true, // Crucial: Allows the frontend to send and receive cookies
     })
 );

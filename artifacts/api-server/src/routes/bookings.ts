@@ -8,7 +8,9 @@ const router = Router({ mergeParams: true });
 
 router.get("/", authenticate, async (req: AuthRequest, res) => {
   const hotelId = parseInt(req.params.hotelId);
-
+  if (isNaN(hotelId)) {
+    return res.status(400).json({ message: "Invalid or missing Hotel ID" });
+  }
   const bookings = await db
     .select({
       id: bookingsTable.id,
