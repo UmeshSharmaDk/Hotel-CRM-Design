@@ -17,14 +17,17 @@
     "dotenv": "^17.4.0",
     "drizzle-orm": "catalog:",
     "express": "^5",
+    "express-mysql-session": "^3.0.3",
     "express-session": "^1.17.0",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.20.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/express-mysql-session": "^3.0.8",
     "@types/express-session": "^1.17.8",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "catalog:",
