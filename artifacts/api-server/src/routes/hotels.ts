@@ -21,21 +21,25 @@ router.get("/", authenticate, async (req: AuthRequest, res) => {
 
 router.post("/", authenticate, requireRole("admin"), async (req, res) => {
   const { name, totalRooms, planStartDate, planEndDate } = req.body;
+  const result = await db.insert(hotelsTable).values({ name, totalRooms, planStartDate, planEndDate });
   const created = await db
-    .insert(hotelsTable)
-    .values({ name, totalRooms, planStartDate, planEndDate })
-    .returning();
+    .select()
+    .from(hotelsTable)
+    .where(eq(hotelsTable.id, (result as any).insertId));
   res.status(201).json(created[0]);
 });
 
 router.put("/:id", authenticate, requireRole("admin"), async (req, res) => {
   const id = parseInt(req.params.id);
   const { name, totalRooms, planStartDate, planEndDate } = req.body;
-  const updated = await db
+  await db
     .update(hotelsTable)
     .set({ name, totalRooms, planStartDate, planEndDate })
-    .where(eq(hotelsTable.id, id))
-    .returning();
+    .where(eq(hotelsTable.id, id));
+  const updated = await db
+    .select()
+    .from(hotelsTable)
+    .where(eq(hotelsTable.id, id));
   res.json(updated[0]);
 });
 

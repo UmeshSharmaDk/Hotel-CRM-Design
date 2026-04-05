@@ -1,12 +1,19 @@
 {
   "version": "7",
-  "dialect": "postgresql",
+  "dialect": "mysql",
   "entries": [
     {
       "idx": 0,
-      "version": "7",
-      "when": 1775333462112,
-      "tag": "0000_ambiguous_dakota_north",
+      "version": "5",
+      "when": 1775413043944,
+      "tag": "0000_broken_morbius",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1775413605988,
+      "tag": "0001_stale_magus",
       "breakpoints": true
     }
   ]

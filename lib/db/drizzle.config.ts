@@ -11,8 +11,10 @@ if (!process.env.DATABASE_URL) {
 export default defineConfig({
   schema: "./src/schema",
   out: "./drizzle",
-  dialect: "postgresql",
+  dialect: "mysql",
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    host: "127.0.0.1",
+    user: "root",
+    database: "hotel_crm",
   },
 });

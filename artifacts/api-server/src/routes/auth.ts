@@ -107,11 +107,15 @@ router.put("/update-profile", authenticate, async (req, res) => {
     updates.password = hashPassword(newPassword);
   }
 
-  const updated = await db
+  await db
     .update(usersTable)
     .set(updates)
-    .where(eq(usersTable.id, userId))
-    .returning();
+    .where(eq(usersTable.id, userId));
+
+  const updated = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
 
   const u = updated[0];
   res.json({

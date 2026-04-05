@@ -15,21 +15,27 @@ router.get("/", authenticate, async (req: AuthRequest, res) => {
 router.post("/", authenticate, async (req: AuthRequest, res) => {
   const hotelId = parseInt(req.params.hotelId);
   const { name } = req.body;
-  const created = await db
+  const result = await db
     .insert(agenciesTable)
-    .values({ name, hotelId })
-    .returning();
+    .values({ name, hotelId });
+  const created = await db
+    .select()
+    .from(agenciesTable)
+    .where(eq(agenciesTable.id, (result as any).insertId));
   res.status(201).json(created[0]);
 });
 
 router.put("/:agencyId", authenticate, async (req, res) => {
   const agencyId = parseInt(req.params.agencyId);
   const { name } = req.body;
-  const updated = await db
+  await db
     .update(agenciesTable)
     .set({ name })
-    .where(eq(agenciesTable.id, agencyId))
-    .returning();
+    .where(eq(agenciesTable.id, agencyId));
+  const updated = await db
+    .select()
+    .from(agenciesTable)
+    .where(eq(agenciesTable.id, agencyId));
   res.json(updated[0]);
 });
 

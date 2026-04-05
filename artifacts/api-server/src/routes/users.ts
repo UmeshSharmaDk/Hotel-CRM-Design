@@ -29,10 +29,14 @@ router.post("/", authenticate, requireRole("admin", "hotel_owner"), async (req: 
   const hotelId = parseInt(req.params.hotelId);
   const { name, email, password, role } = req.body;
 
-  const created = await db
+  const result = await db
     .insert(usersTable)
-    .values({ name, email, password: hashPassword(password), role, hotelId })
-    .returning();
+    .values({ name, email, password: hashPassword(password), role, hotelId });
+
+  const created = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, (result as any).insertId));
 
   const u = created[0];
   res.status(201).json({
@@ -54,11 +58,15 @@ router.put("/:userId", authenticate, requireRole("admin", "hotel_owner"), async 
   if (role) updates.role = role;
   if (password) updates.password = hashPassword(password);
 
-  const updated = await db
+  await db
     .update(usersTable)
     .set(updates)
-    .where(eq(usersTable.id, userId))
-    .returning();
+    .where(eq(usersTable.id, userId));
+
+  const updated = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
 
   const u = updated[0];
   res.json({

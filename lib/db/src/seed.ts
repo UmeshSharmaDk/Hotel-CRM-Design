@@ -1,4 +1,12 @@
 import "dotenv/config";
+import path from "path";
+import { fileURLToPath } from "url";
+import { config } from "dotenv";
+
+// Load environment variables from the api-server .env file
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+config({ path: path.resolve(__dirname, "../../artifacts/api-server/.env") });
+
 import { db } from "./index.js";
 import { usersTable } from "./schema/index.js";
 import { eq } from "drizzle-orm";

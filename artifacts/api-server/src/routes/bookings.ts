@@ -44,7 +44,7 @@ router.post("/", authenticate, async (req: AuthRequest, res) => {
     totalCost, dueBalance, notes
   } = req.body;
 
-  const created = await db
+  const result = await db
     .insert(bookingsTable)
     .values({
       hotelId,
@@ -60,8 +60,12 @@ router.post("/", authenticate, async (req: AuthRequest, res) => {
       totalCost: totalCost.toString(),
       dueBalance: (dueBalance || "0").toString(),
       notes: notes || null,
-    })
-    .returning();
+    });
+
+  const created = await db
+    .select()
+    .from(bookingsTable)
+    .where(eq(bookingsTable.id, (result as any).insertId));
 
   const booking = created[0];
   let agencyName = null;
@@ -95,11 +99,15 @@ router.put("/:bookingId", authenticate, async (req: AuthRequest, res) => {
   if (dueBalance !== undefined) updates.dueBalance = dueBalance.toString();
   if (notes !== undefined) updates.notes = notes || null;
 
-  const updated = await db
+  await db
     .update(bookingsTable)
     .set(updates)
-    .where(eq(bookingsTable.id, bookingId))
-    .returning();
+    .where(eq(bookingsTable.id, bookingId));
+
+  const updated = await db
+    .select()
+    .from(bookingsTable)
+    .where(eq(bookingsTable.id, bookingId));
 
   const booking = updated[0];
   let agencyName = null;
